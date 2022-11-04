@@ -1,33 +1,48 @@
-// const axios = require('axios')
-// const url = 'http://checkip.amazonaws.com/';
-let response;
+const request = require('request');
 
-/**
- *
- * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
- * @param {Object} event - API Gateway Lambda Proxy Input Format
- *
- * Context doc: https://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html 
- * @param {Object} context
- *
- * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
- * @returns {Object} object - API Gateway Lambda Proxy Output Format
- * 
- */
+function line(responseBody, searchElement) {
+    let index = responseBody.indexOf(searchElement)
+    return responseBody.substring(index, index + 27)
+}
+
+function sendMessage(line) {
+    //TODO complete this
+    console.log("--- SENDING MESSAGE")
+}
+
+function validateAndSendMessage(line, stringToValidateTo) {
+    if (line !== stringToValidateTo) {
+        console.log("Found line different than expected, this means there was a change")
+        sendMessage(line)
+    }
+}
+
 exports.lambdaHandler = async (event, context) => {
     try {
-        // const ret = await axios(url);
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify({
-                message: 'hello world',
-                // location: ret.data.trim()
-            })
-        }
+        let responseBody = await new Promise((resolve, reject) => {
+
+            let options = {
+                'method': 'GET',
+                'url': 'https://qatarscanner.com/',
+                'headers': {}
+            };
+
+            request(options, function (error, response) {
+                if (error) reject();
+                resolve(response.body)
+            });
+        })
+
+        const m24Line = line(responseBody, "M24");
+        const m39Line = line(responseBody, "M39");
+        const m50Line = line(responseBody, "M50");
+
+        validateAndSendMessage(m24Line, "M24 I... D.... RI... RD....");
+        validateAndSendMessage(m39Line, "M39 I... D.... RI... RD....");
+        validateAndSendMessage(m50Line, "M50 I... D.... RI... RD....");
+
     } catch (err) {
         console.log(err);
         return err;
     }
-
-    return response
 };
