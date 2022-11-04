@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "qatar-scanner-bot"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-fd3rtu1cq4jn"
+s3_prefix = "qatar-scanner-bot"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
+image_repositories = ["QatarScannerFunction=869579352973.dkr.ecr.us-east-1.amazonaws.com/qatarscannerbotcab76bb2/qatarscannerfunction6adff904repo"]
